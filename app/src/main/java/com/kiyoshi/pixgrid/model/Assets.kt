@@ -40,15 +40,50 @@ data class BackgroundChoice(
 
 val BundledBackgrounds: List<BackgroundChoice> = listOf(
     BackgroundChoice("solid", "Warna", null, Color(0xFF0A0A0F)),
-    BackgroundChoice("ember", "Ember", "backgrounds/mesh_ember.webp"),
-    BackgroundChoice("ocean", "Ocean", "backgrounds/mesh_ocean.webp"),
-    BackgroundChoice("blush", "Blush", "backgrounds/mesh_blush.webp"),
-    BackgroundChoice("noir", "Noir", "backgrounds/grad_noir.webp"),
-    BackgroundChoice("sunset", "Sunset", "backgrounds/grad_sunset.webp"),
-    BackgroundChoice("bokeh_w", "Bokeh W", "backgrounds/bokeh_warm.webp"),
-    BackgroundChoice("bokeh_c", "Bokeh C", "backgrounds/bokeh_cool.webp"),
-    BackgroundChoice("grain", "Grain", "backgrounds/grain_film.webp"),
-    BackgroundChoice("paper", "Kertas", "textures/paper.webp", isTexture = true),
+
+    // Mesh gradient
+    BackgroundChoice("mesh_ember", "Ember", "backgrounds/mesh_ember.webp"),
+    BackgroundChoice("mesh_ocean", "Ocean", "backgrounds/mesh_ocean.webp"),
+    BackgroundChoice("mesh_blush", "Blush", "backgrounds/mesh_blush.webp"),
+    BackgroundChoice("mesh_lavender", "Lavender", "backgrounds/mesh_lavender.webp"),
+    BackgroundChoice("mesh_forest", "Forest", "backgrounds/mesh_forest.webp"),
+    BackgroundChoice("mesh_peach", "Peach", "backgrounds/mesh_peach.webp"),
+    BackgroundChoice("mesh_midnight", "Midnight", "backgrounds/mesh_midnight.webp"),
+    BackgroundChoice("mesh_rose", "Rose", "backgrounds/mesh_rose.webp"),
+    BackgroundChoice("mesh_mint", "Mint", "backgrounds/mesh_mint.webp"),
+    BackgroundChoice("mesh_gold", "Gold", "backgrounds/mesh_gold.webp"),
+    BackgroundChoice("mesh_steel", "Steel", "backgrounds/mesh_steel.webp"),
+
+    // Linear gradient
+    BackgroundChoice("grad_noir", "Noir", "backgrounds/grad_noir.webp"),
+    BackgroundChoice("grad_sunset", "Sunset", "backgrounds/grad_sunset.webp"),
+    BackgroundChoice("grad_dawn", "Dawn", "backgrounds/grad_dawn.webp"),
+    BackgroundChoice("grad_sky", "Sky", "backgrounds/grad_sky.webp"),
+    BackgroundChoice("grad_crimson", "Crimson", "backgrounds/grad_crimson.webp"),
+    BackgroundChoice("grad_jade", "Jade", "backgrounds/grad_jade.webp"),
+    BackgroundChoice("grad_honey", "Honey", "backgrounds/grad_honey.webp"),
+    BackgroundChoice("grad_slate", "Slate", "backgrounds/grad_slate.webp"),
+
+    // Bokeh
+    BackgroundChoice("bokeh_warm", "Bokeh W", "backgrounds/bokeh_warm.webp"),
+    BackgroundChoice("bokeh_cool", "Bokeh C", "backgrounds/bokeh_cool.webp"),
+    BackgroundChoice("bokeh_ember", "Bokeh E", "backgrounds/bokeh_ember.webp"),
+    BackgroundChoice("bokeh_azure", "Bokeh A", "backgrounds/bokeh_azure.webp"),
+    BackgroundChoice("bokeh_green", "Bokeh G", "backgrounds/bokeh_green.webp"),
+    BackgroundChoice("bokeh_rose", "Bokeh R", "backgrounds/bokeh_rose.webp"),
+
+    // Grain
+    BackgroundChoice("grain_film", "Grain", "backgrounds/grain_film.webp"),
+    BackgroundChoice("grain_warm", "Grain W", "backgrounds/grain_warm.webp", isTexture = true),
+    BackgroundChoice("grain_cool", "Grain C", "backgrounds/grain_cool.webp", isTexture = true),
+
+    // Kertas
+    BackgroundChoice("paper_white", "Kertas", "backgrounds/paper_white.webp", isTexture = true),
+    BackgroundChoice("paper_kraft", "Kraft", "backgrounds/paper_kraft.webp", isTexture = true),
+    BackgroundChoice("paper_black", "Kertas Gelap", "backgrounds/paper_black.webp", isTexture = true),
+    BackgroundChoice("paper", "Paper Lama", "textures/paper.webp", isTexture = true),
+
+    // Tekstur lain
     BackgroundChoice("linen", "Linen", "textures/linen.webp", isTexture = true),
     BackgroundChoice("marble", "Marmer", "textures/marble.webp", isTexture = true),
     BackgroundChoice("denim", "Denim", "textures/denim.webp", isTexture = true),
@@ -166,5 +201,82 @@ val BundledTemplates: List<TemplatePreset> = listOf(
         "sunset_fade", "Sunset", "a2", 4f / 5f,
         "backgrounds/grad_sunset.webp", 0.014f, Color(0xFFFFC078), 0.015f, 0.022f,
         "senja", "pacifico_regular", Color(0xFFFFF3E0), 0.08f, 0.93f,
+    ),
+    TemplatePreset(
+        "lavender_dream", "Lavender", "mag2", 4f / 5f,
+        "backgrounds/mesh_lavender.webp", 0.012f, Color(0xFFE8E0FF), 0.028f, 0.024f,
+        "dream", "sacramento_regular", Color(0xFF3A2E5A), 0.09f, 0.93f,
+    ),
+    TemplatePreset(
+        "forest_earth", "Forest", "a1", 1f,
+        "backgrounds/mesh_forest.webp", 0.016f, Color(0xFF9FD8B8), 0.01f, 0.025f,
+        "ALAM", "anton_regular", Color(0xFFE8F5EC), 0.07f, 0.94f,
+    ),
+    TemplatePreset(
+        "peach_soft", "Peach", "pol2", 4f / 5f,
+        "backgrounds/mesh_peach.webp", 0.045f, Color(0xFFFFF0E8), 0.0f, 0.028f,
+        "manis", "pacifico_regular", Color(0xFF6A3A28), 0.075f, 0.90f,
+    ),
+    TemplatePreset(
+        "midnight_glow", "Midnight", "mag1", 9f / 16f,
+        "backgrounds/mesh_midnight.webp", 0.01f, Color(0xFF5090E0), 0.018f, 0.02f,
+    ),
+    TemplatePreset(
+        "rose_gold", "Rose Gold", "grid2", 1f,
+        "backgrounds/mesh_rose.webp", 0.014f, Color(0xFFFFD0DC), 0.022f, 0.024f,
+        "bella", "playfairdisplay_bold", Color(0xFFFFF0F4), 0.055f, 0.935f,
+    ),
+    TemplatePreset(
+        "mint_fresh", "Mint", "g23", 4f / 5f,
+        "backgrounds/mesh_mint.webp", 0.012f, Color(0xFFB8F0E0), 0.02f, 0.022f,
+    ),
+    TemplatePreset(
+        "gold_luxe", "Gold Luxe", "mag3", 4f / 5f,
+        "backgrounds/mesh_gold.webp", 0.016f, Color(0xFFFFE0A0), 0.012f, 0.026f,
+        "LUXE", "playfairdisplay_bold", Color(0xFFFFF8E0), 0.06f, 0.94f,
+    ),
+    TemplatePreset(
+        "steel_urban", "Urban", "a2", 1f,
+        "backgrounds/mesh_steel.webp", 0.014f, Color(0xFFC0C8D8), 0.008f, 0.022f,
+        "URBAN", "oswald_bold", Color(0xFFEDF0F8), 0.07f, 0.94f,
+    ),
+    TemplatePreset(
+        "dawn_soft", "Fajar", "strip3", 9f / 16f,
+        "backgrounds/grad_dawn.webp", 0.028f, Color(0xFF3A1830), 0.0f, 0.035f,
+        "fajar", "caveat_bold", Color(0xFFFFE8D8), 0.075f, 0.945f,
+    ),
+    TemplatePreset(
+        "crimson_bold", "Crimson", "mag4", 4f / 5f,
+        "backgrounds/grad_crimson.webp", 0.012f, Color(0xFFE06060), 0.016f, 0.024f,
+        "BERANI", "anton_regular", Color(0xFFFFF0F0), 0.075f, 0.945f,
+    ),
+    TemplatePreset(
+        "honey_warm", "Honey", "grid3", 1f,
+        "backgrounds/grad_honey.webp", 0.012f, Color(0xFFFFE0A0), 0.024f, 0.026f,
+        "hangat", "lobster_regular", Color(0xFFFFF8E8), 0.07f, 0.94f,
+    ),
+    TemplatePreset(
+        "kraft_notebook", "Notebook", "pol1", 4f / 5f,
+        "backgrounds/paper_kraft.webp", 0.05f, Color(0xFFE8D8B8), 0.0f, 0.03f,
+        "catatan", "caveat_bold", Color(0xFF4A3420), 0.085f, 0.90f,
+    ),
+    TemplatePreset(
+        "black_metal", "Metal", "mag1", 1f,
+        "backgrounds/paper_black.webp", 0.014f, Color(0xFF6A6A78), 0.006f, 0.022f,
+        "NOIR", "bebasneue_regular", Color(0xFFEDEDF5), 0.075f, 0.945f,
+    ),
+    TemplatePreset(
+        "azure_cool", "Azure", "a1", 4f / 5f,
+        "backgrounds/bokeh_azure.webp", 0.014f, Color(0xFFA0D0FF), 0.02f, 0.024f,
+    ),
+    TemplatePreset(
+        "green_fresh", "Sage", "pol2", 1f,
+        "backgrounds/bokeh_green.webp", 0.04f, Color(0xFFE8F8E8), 0.0f, 0.028f,
+        "hijau", "righteous_regular", Color(0xFF2A4A2A), 0.07f, 0.90f,
+    ),
+    TemplatePreset(
+        "rose_bokeh", "Rosé", "mag2", 4f / 5f,
+        "backgrounds/bokeh_rose.webp", 0.014f, Color(0xFFFFD0E0), 0.024f, 0.024f,
+        "rosé", "sacramento_regular", Color(0xFFFFF0F5), 0.085f, 0.935f,
     ),
 )

@@ -113,7 +113,30 @@ val BundledBackgrounds: List<BackgroundChoice> = listOf(
     BackgroundChoice("neon_grid", "Neon", "backgrounds/neon_grid.webp"),
     BackgroundChoice("halftone", "Halftone", "backgrounds/halftone.webp", isTexture = true),
     BackgroundChoice("diagonal_pop", "Pop", "backgrounds/diagonal_pop.webp", isTexture = true),
+
+    // Duo gradient
+    BackgroundChoice("duo_ember", "Duo Ember", "backgrounds/duo_ember.webp"),
+    BackgroundChoice("duo_teal", "Duo Teal", "backgrounds/duo_teal.webp"),
+    BackgroundChoice("duo_plum", "Duo Plum", "backgrounds/duo_plum.webp"),
+    BackgroundChoice("duo_sage", "Duo Sage", "backgrounds/duo_sage.webp"),
+    BackgroundChoice("duo_sand", "Duo Sand", "backgrounds/duo_sand.webp"),
+    BackgroundChoice("duo_silver", "Duo Silver", "backgrounds/duo_silver.webp"),
+
+    // Radial glow
+    BackgroundChoice("glow_warm", "Glow Hangat", "backgrounds/glow_warm.webp"),
+    BackgroundChoice("glow_cool", "Glow Dingin", "backgrounds/glow_cool.webp"),
+    BackgroundChoice("glow_pink", "Glow Pink", "backgrounds/glow_pink.webp"),
+
+    // Noise
+    BackgroundChoice("noise_plum", "Noise Plum", "backgrounds/noise_plum.webp", isTexture = true),
+    BackgroundChoice("noise_deep", "Noise Deep", "backgrounds/noise_deep.webp", isTexture = true),
+
+    // Abstrak
+    BackgroundChoice("abstract_ember", "Abstrak Ember", "backgrounds/abstract_ember.webp"),
+    BackgroundChoice("abstract_ocean", "Abstrak Ocean", "backgrounds/abstract_ocean.webp"),
+    BackgroundChoice("abstract_lime", "Abstrak Lime", "backgrounds/abstract_lime.webp"),
 )
+
 
 
 /** Sticker berbasis gambar dari assets/stickers_png. */

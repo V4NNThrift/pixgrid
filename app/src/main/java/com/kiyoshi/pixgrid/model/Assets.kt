@@ -91,7 +91,30 @@ val BundledBackgrounds: List<BackgroundChoice> = listOf(
     BackgroundChoice("wood", "Kayu", "textures/wood.webp", isTexture = true),
     BackgroundChoice("nebula", "Nebula", "textures/nebula.webp", isTexture = true),
     BackgroundChoice("frosted", "Kaca", "textures/frosted.webp", isTexture = true),
+
+    // Tekstur resolusi tinggi
+    BackgroundChoice("canvas_t", "Kanvas", "textures/canvas.webp", isTexture = true),
+    BackgroundChoice("leather", "Kulit", "textures/leather.webp", isTexture = true),
+    BackgroundChoice("stone", "Batu", "textures/stone.webp", isTexture = true),
+    BackgroundChoice("sand", "Pasir", "textures/sand.webp", isTexture = true),
+    BackgroundChoice("brick", "Bata", "textures/brick.webp", isTexture = true),
+    BackgroundChoice("concrete_hi", "Beton Kasar", "textures/concrete_hi.webp", isTexture = true),
+    BackgroundChoice("water", "Air", "textures/water.webp", isTexture = true),
+    BackgroundChoice("sky", "Langit", "textures/sky.webp", isTexture = true),
+    BackgroundChoice("leafy", "Dedaunan", "textures/leafy.webp", isTexture = true),
+    BackgroundChoice("bloom", "Bloom", "textures/bloom.webp", isTexture = true),
+
+    // Dramatis
+    BackgroundChoice("aurora", "Aurora", "backgrounds/aurora.webp"),
+    BackgroundChoice("galaxy", "Galaxy", "backgrounds/galaxy.webp"),
+    BackgroundChoice("fire", "Api", "backgrounds/fire.webp"),
+    BackgroundChoice("ice", "Es", "backgrounds/ice.webp"),
+    BackgroundChoice("tiedye", "Tie Dye", "backgrounds/tiedye.webp"),
+    BackgroundChoice("neon_grid", "Neon", "backgrounds/neon_grid.webp"),
+    BackgroundChoice("halftone", "Halftone", "backgrounds/halftone.webp", isTexture = true),
+    BackgroundChoice("diagonal_pop", "Pop", "backgrounds/diagonal_pop.webp", isTexture = true),
 )
+
 
 /** Sticker berbasis gambar dari assets/stickers_png. */
 data class StickerAsset(
@@ -278,5 +301,85 @@ val BundledTemplates: List<TemplatePreset> = listOf(
         "rose_bokeh", "Rosé", "mag2", 4f / 5f,
         "backgrounds/bokeh_rose.webp", 0.014f, Color(0xFFFFD0E0), 0.024f, 0.024f,
         "rosé", "sacramento_regular", Color(0xFFFFF0F5), 0.085f, 0.935f,
+    ),
+    TemplatePreset(
+        "aurora_dream", "Aurora", "mag1", 9f / 16f,
+        "backgrounds/aurora.webp", 0.01f, Color(0xFF8FFFD0), 0.018f, 0.02f,
+        "cahaya", "sacramento_regular", Color(0xFFE0FFF0), 0.085f, 0.94f,
+    ),
+    TemplatePreset(
+        "galaxy_cosmic", "Galaxy", "mag3", 4f / 5f,
+        "backgrounds/galaxy.webp", 0.012f, Color(0xFFB090FF), 0.016f, 0.022f,
+        "KOSMOS", "bebasneue_regular", Color(0xFFEDE8FF), 0.07f, 0.945f,
+    ),
+    TemplatePreset(
+        "fire_bold", "Api", "mag2", 1f,
+        "backgrounds/fire.webp", 0.012f, Color(0xFFFFA040), 0.014f, 0.022f,
+        "BAKAR", "anton_regular", Color(0xFFFFF0E0), 0.08f, 0.942f,
+    ),
+    TemplatePreset(
+        "ice_freeze", "Es", "g32", 4f / 5f,
+        "backgrounds/ice.webp", 0.012f, Color(0xFFD0F0FF), 0.02f, 0.022f,
+        "beku", "righteous_regular", Color(0xFFE8F8FF), 0.07f, 0.94f,
+    ),
+    TemplatePreset(
+        "tiedye_fun", "Tie Dye", "grid2", 1f,
+        "backgrounds/tiedye.webp", 0.018f, Color.White, 0.0f, 0.026f,
+        "warna", "pacifico_regular", Color(0xFF4A3A5A), 0.08f, 0.93f,
+    ),
+    TemplatePreset(
+        "neon_retro", "Neon", "a1", 1f,
+        "backgrounds/neon_grid.webp", 0.012f, Color(0xFFFF3CA0), 0.01f, 0.02f,
+        "RETRO", "oswald_bold", Color(0xFFFFE0F0), 0.075f, 0.942f,
+    ),
+    TemplatePreset(
+        "halftone_print", "Print", "pol1", 1f,
+        "backgrounds/halftone.webp", 0.05f, Color(0xFFF0F0F8), 0.0f, 0.028f,
+        "cetak", "caveat_bold", Color(0xFF202028), 0.085f, 0.90f,
+    ),
+    TemplatePreset(
+        "pop_color", "Pop Art", "a2", 1f,
+        "backgrounds/diagonal_pop.webp", 0.014f, Color.White, 0.012f, 0.022f,
+        "POP!", "anton_regular", Color(0xFF2A2A3A), 0.09f, 0.94f,
+    ),
+    TemplatePreset(
+        "canvas_art", "Kanvas", "mag3", 4f / 5f,
+        "textures/canvas.webp", 0.026f, Color(0xFFEDE6D6), 0.0f, 0.03f,
+        "lukisan", "playfairdisplay_bold", Color(0xFF4A4030), 0.065f, 0.94f,
+    ),
+    TemplatePreset(
+        "leather_journal", "Jurnal", "pol2", 4f / 5f,
+        "textures/leather.webp", 0.045f, Color(0xFF3A2818), 0.0f, 0.028f,
+        "jurnal", "caveat_bold", Color(0xFFF0E0C8), 0.085f, 0.90f,
+    ),
+    TemplatePreset(
+        "stone_mono", "Batu", "g23", 1f,
+        "textures/stone.webp", 0.014f, Color(0xFFE8E6E0), 0.008f, 0.024f,
+        "mono", "montserrat_bold", Color(0xFFF0EEE8), 0.05f, 0.945f,
+    ),
+    TemplatePreset(
+        "brick_city", "Kota", "mag4", 4f / 5f,
+        "textures/brick.webp", 0.014f, Color(0xFFF0D8C8), 0.01f, 0.022f,
+        "KOTA", "montserrat_bold", Color(0xFFFFF0E8), 0.065f, 0.945f,
+    ),
+    TemplatePreset(
+        "water_flow", "Air", "strip3", 9f / 16f,
+        "textures/water.webp", 0.028f, Color(0xFF2080C0), 0.0f, 0.034f,
+        "mengalir", "pacifico_regular", Color(0xFFE8F8FF), 0.08f, 0.945f,
+    ),
+    TemplatePreset(
+        "sky_cloud", "Langit", "pol1", 4f / 5f,
+        "textures/sky.webp", 0.05f, Color(0xFFF8FBFF), 0.0f, 0.028f,
+        "bebas", "sacramento_regular", Color(0xFF3A5A80), 0.09f, 0.90f,
+    ),
+    TemplatePreset(
+        "leafy_tropis", "Tropis", "a1", 1f,
+        "textures/leafy.webp", 0.016f, Color(0xFF40C080), 0.012f, 0.024f,
+        "TROPIK", "bebasneue_regular", Color(0xFFE0FFE8), 0.072f, 0.942f,
+    ),
+    TemplatePreset(
+        "bloom_floral", "Floral", "mag2", 4f / 5f,
+        "textures/bloom.webp", 0.015f, Color(0xFFFFB0D0), 0.02f, 0.024f,
+        "mekar", "lobster_regular", Color(0xFFFFF0F8), 0.075f, 0.94f,
     ),
 )

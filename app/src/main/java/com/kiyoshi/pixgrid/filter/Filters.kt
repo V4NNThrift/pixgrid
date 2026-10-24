@@ -152,6 +152,19 @@ object Filters {
 
     fun byId(id: String): PhotoFilter = all.firstOrNull { it.id == id } ?: all[0]
 
+    /** Versi floatArray untuk android.graphics.ColorMatrixColorFilter. */
+    fun blendedFloatArray(filterId: String, strength: Float): FloatArray {
+        val f = byId(filterId)
+        if (f.id == "none") return identity.copyOf()
+        val s = strength.coerceIn(0f, 1f)
+        val src = f.matrix.values
+        val out = FloatArray(20)
+        for (i in 0 until 20) {
+            out[i] = identity[i] * (1f - s) + src[i] * s
+        }
+        return out
+    }
+
     /** Campur matriks filter dengan identitas sesuai kekuatan 0f..1f. */
     fun blended(filterId: String, strength: Float): ColorMatrix {
         val f = byId(filterId)

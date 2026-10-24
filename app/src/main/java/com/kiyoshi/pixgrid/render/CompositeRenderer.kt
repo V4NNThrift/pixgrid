@@ -295,19 +295,19 @@ object CompositeRenderer {
     ) {
         val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
         if (slot.filterId != "none") {
-            val cm = Filters.blended(slot.filterId, slot.filterStrength)
-            paint.colorFilter = ColorMatrixColorFilter(cm)
+            val cmArr = Filters.blendedFloatArray(slot.filterId, slot.filterStrength)
+            paint.colorFilter = ColorMatrixColorFilter(cmArr)
         }
 
         val srcX = slot.cropX * bmp.width
         val srcY = slot.cropY * bmp.height
         val srcW = (slot.cropWidth * bmp.width).coerceAtLeast(1f)
         val srcH = (slot.cropHeight * bmp.height).coerceAtLeast(1f)
-        val src = RectF(
-            srcX.coerceIn(0f, bmp.width - 1f),
-            srcY.coerceIn(0f, bmp.height - 1f),
-            (srcX + srcW).coerceIn(1f, bmp.width.toFloat()),
-            (srcY + srcH).coerceIn(1f, bmp.height.toFloat()),
+        val src = android.graphics.Rect(
+            srcX.coerceIn(0f, bmp.width - 1f).toInt(),
+            srcY.coerceIn(0f, bmp.height - 1f).toInt(),
+            (srcX + srcW).coerceIn(1f, bmp.width.toFloat()).toInt(),
+            (srcY + srcH).coerceIn(1f, bmp.height.toFloat()).toInt(),
         )
 
         canvas.save()

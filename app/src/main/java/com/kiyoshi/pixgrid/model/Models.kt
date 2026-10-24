@@ -35,6 +35,7 @@ data class BorderStyle(
 data class CanvasStyle(
     val aspectRatio: Float = 1f,    // width / height
     val background: Color = Color.Black,
+    val backgroundAsset: String? = null,   // null = pakai warna solid
     val backgroundBlur: Boolean = false,
     val border: BorderStyle = BorderStyle(),
 )
@@ -48,16 +49,20 @@ data class TextItem(
     val size: Float = 0.08f,
     val color: Color = Color.White,
     val rotation: Float = 0f,
-    val fontAsset: String = "",
+    val fontRes: String = "",
     val bold: Boolean = false,
     val italic: Boolean = false,
     val shadow: Boolean = true,
 )
 
-/** Sticker emoji/glyph. [glyph] adalah karakter yang digambar. */
+/**
+ * Sticker: bisa dari aset PNG ([asset]) atau glyph emoji ([glyph]).
+ * Kalau [asset] diisi, gambar PNG yang dipakai.
+ */
 data class StickerItem(
     val id: String,
-    val glyph: String,
+    val glyph: String = "",
+    val asset: String = "",
     val x: Float = 0.5f,
     val y: Float = 0.5f,
     val size: Float = 0.18f,

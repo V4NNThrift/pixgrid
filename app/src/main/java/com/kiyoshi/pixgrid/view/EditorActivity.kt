@@ -30,6 +30,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Wallpaper
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.CropSquare
@@ -281,11 +283,22 @@ fun EditorScreen(onClose: () -> Unit, vm: EditorViewModel = viewModel()) {
                         .padding(16.dp),
                 ) {
                     when (state.tool) {
+                        Tool.TEMPLATE -> TemplatePanel(vm = vm)
                         Tool.PHOTO -> PhotoPanel(vm = vm, state = state, onPick = { launchPhotoPicker(picker) })
                         Tool.BORDER -> BorderPanel(vm = vm, state = state)
+                        Tool.BACKGROUND -> BackgroundPanel(vm = vm, currentAsset = state.style.backgroundAsset)
                         Tool.FILTER -> FilterPanel(vm = vm, state = state)
-                        Tool.TEXT -> TextPanel(vm = vm, state = state, onAdd = { showTextDialog = true })
-                        Tool.STICKER -> StickerPanel(vm = vm, state = state)
+                        Tool.TEXT -> {
+                            TextPanel(vm = vm, state = state, onAdd = { showTextDialog = true })
+                            val sel = state.texts.firstOrNull { it.id == state.selectedTextId }
+                                ?: state.texts.lastOrNull()
+                            FontPickerPanel(
+                                vm = vm,
+                                textId = sel?.id,
+                                currentFont = sel?.fontRes ?: "",
+                            )
+                        }
+                        Tool.STICKER -> StickerAssetPanel(vm = vm)
                         Tool.DOODLE -> DoodlePanel(vm = vm, state = state)
                         Tool.FORMAT -> FormatPanel(vm = vm, state = state)
                         Tool.LAYOUT -> LayoutPanel(vm = vm, state = state)
@@ -346,6 +359,8 @@ fun EditorScreen(onClose: () -> Unit, vm: EditorViewModel = viewModel()) {
 private fun ToolIcon(tool: Tool, active: Boolean) {
     val tint = if (active) Color(0xFFFF7A45) else Mist
     val icon = when (tool) {
+        Tool.TEMPLATE -> Icons.Filled.AutoAwesome
+        Tool.BACKGROUND -> Icons.Filled.Wallpaper
         Tool.LAYOUT -> Icons.Filled.GridView
         Tool.PHOTO -> Icons.Filled.Image
         Tool.BORDER -> Icons.Filled.CropSquare

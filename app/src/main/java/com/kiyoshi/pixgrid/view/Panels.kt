@@ -295,11 +295,18 @@ fun TextPanel(
             Spacer(Modifier.height(14.dp))
             SectionLabel("DAFTAR TEKS")
             state.texts.forEach { t ->
+                val selected = t.id == state.selectedTextId
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(10.dp))
-                        .background(Ink3)
+                        .background(if (selected) Color(0xFF3A1A08) else Ink3)
+                        .border(
+                            if (selected) 1.5.dp else 0.dp,
+                            if (selected) Color(0xFFFF7A45) else Color.Transparent,
+                            RoundedCornerShape(10.dp),
+                        )
+                        .clickable { vm.selectText(t.id) }
                         .padding(horizontal = 12.dp, vertical = 10.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {

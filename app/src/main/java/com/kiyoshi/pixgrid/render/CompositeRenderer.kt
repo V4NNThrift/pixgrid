@@ -81,6 +81,60 @@ object CompositeRenderer {
         }
     }
 
+    /** Decode gambar dari assets dengan sampling. */
+    private fun decodeAsset(
+        context: Context,
+        assetPath: String,
+        reqWidth: Int,
+    ): Bitmap? {
+        val key = "asset:$assetPath@$reqWidth"
+        bitmapCache[key]?.let { if (!it.isRecycled) return it }
+        return try {
+            val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            context.assets.open(assetPath).use { BitmapFactory.decodeStream(it, null, bounds) }
+            if (bounds.outWidth <= 0) return null
+
+            var sample = 1
+            while (bounds.outWidth / (sample * 2) >= reqWidth) sample *= 2
+
+            val opts = BitmapFactory.Options().apply {
+                inSampleSize = max(1, sample)
+                inPreferredConfig = Bitmap.Config.ARGB_8888
+            }
+            val bmp = context.assets.open(assetPath).use {
+                BitmapFactory.decodeStream(it, null, opts)
+            } ?: return null
+
+            if (bitmapCache.size >= 12) bitmapCache.clear()
+            bitmapCache[key] = bmp
+            bmp
+        } catch (t: Throwable) {
+            null
+        }
+    }
+
+    /** Muat Typeface dari res/font, fallback ke default. */
+    private fun loadTypeface(context: Context, resName: String): android.graphics.Typeface {
+        if (resName.isBlank()) return android.graphics.Typeface.DEFAULT
+        val key = "tf:$resName"
+        typefaceCache[key]?.let { return it }
+        return try {
+            val resId = context.resources.getIdentifier(resName, "font", context.packageName)
+            val tf = if (resId != 0) {
+                androidx.core.content.res.ResourcesCompat.getFont(context, resId)
+                    ?: android.graphics.Typeface.DEFAULT
+            } else {
+                android.graphics.Typeface.DEFAULT
+            }
+            typefaceCache[key] = tf
+            tf
+        } catch (t: Throwable) {
+            android.graphics.Typeface.DEFAULT
+        }
+    }
+
+    private val typefaceCache = mutableMapOf<String, android.graphics.Typeface>()
+
     private fun applyExif(context: Context, uri: String, bmp: Bitmap): Bitmap {
         return try {
             val orientation = context.contentResolver
@@ -137,10 +191,30 @@ object CompositeRenderer {
         val fw = w.toFloat()
         val fh = h.toFloat()
 
-        // Latar belakang
-        val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        bgPaint.color = canvasStyle.background.toArgbInt()
-        canvas.drawRect(0f, 0f, fw, fh, bgPaint)
+        // Latar belakang: asset gambar kalau ada, kalau tidak warna solid
+        val bgAsset = canvasStyle.backgroundAsset
+        val bgBitmap = if (!bgAsset.isNullOrBlank()) decodeAsset(context, bgAsset, w) else null
+
+        if (bgBitmap != null) {
+            // center-crop agar memenuhi kanvas
+            val bw = bgBitmap.width.toFloat()
+            val bh = bgBitmap.height.toFloat()
+            val scale = max(fw / bw, fh / bh)
+            val dw = bw * scale
+            val dh = bh * scale
+            val left = (fw - dw) / 2f
+            val top = (fh - dh) / 2f
+            val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+            canvas.drawBitmap(
+                bgBitmap, null,
+                RectF(left, top, left + dw, top + dh),
+                bgPaint
+            )
+        } else {
+            val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+            bgPaint.color = canvasStyle.background.toArgbInt()
+            canvas.drawRect(0f, 0f, fw, fh, bgPaint)
+        }
 
         // Blur latar dari foto pertama
         if (canvasStyle.backgroundBlur) {
@@ -235,6 +309,9 @@ object CompositeRenderer {
             textPaint.textAlign = Paint.Align.CENTER
             textPaint.isFakeBoldText = t.bold
             textPaint.textSkewX = if (t.italic) -0.25f else 0f
+            if (t.fontRes.isNotBlank()) {
+                textPaint.typeface = loadTypeface(context, t.fontRes)
+            }
             if (t.shadow) {
                 textPaint.setShadowLayer(
                     textPaint.textSize * 0.12f, 0f, textPaint.textSize * 0.05f,
@@ -248,13 +325,30 @@ object CompositeRenderer {
         }
 
         // Sticker
-        stickers.forEach { s ->
-            val stickerPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-            stickerPaint.textSize = s.size * shortest
-            stickerPaint.textAlign = Paint.Align.CENTER
+        stickers.forEach { st ->
+            val cx = st.x * fw
+            val cy = st.y * fh
+            val sizePx = st.size * shortest
+
             canvas.save()
-            canvas.rotate(s.rotation, s.x * fw, s.y * fh)
-            canvas.drawText(s.glyph, s.x * fw, s.y * fh, stickerPaint)
+            canvas.rotate(st.rotation, cx, cy)
+
+            if (st.asset.isNotBlank()) {
+                val bmp = decodeAsset(context, st.asset, sizePx.toInt().coerceAtLeast(8))
+                if (bmp != null) {
+                    val half = sizePx / 2f
+                    canvas.drawBitmap(
+                        bmp, null,
+                        RectF(cx - half, cy - half, cx + half, cy + half),
+                        Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+                    )
+                }
+            } else if (st.glyph.isNotBlank()) {
+                val stickerPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+                stickerPaint.textSize = sizePx
+                stickerPaint.textAlign = Paint.Align.CENTER
+                canvas.drawText(st.glyph, cx, cy, stickerPaint)
+            }
             canvas.restore()
         }
 

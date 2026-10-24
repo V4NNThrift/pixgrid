@@ -5,7 +5,9 @@ import com.kiyoshi.pixgrid.model.BorderStyle
 import com.kiyoshi.pixgrid.model.CanvasStyle
 import com.kiyoshi.pixgrid.model.Doodle
 import com.kiyoshi.pixgrid.model.GridLayout
+import com.kiyoshi.pixgrid.model.BundledTemplates
 import com.kiyoshi.pixgrid.model.Layouts
+import com.kiyoshi.pixgrid.model.TemplatePreset
 import com.kiyoshi.pixgrid.model.PhotoSlot
 import com.kiyoshi.pixgrid.model.StickerItem
 import com.kiyoshi.pixgrid.model.TextItem
@@ -33,9 +35,11 @@ data class EditorState(
 }
 
 enum class Tool(val label: String) {
+    TEMPLATE("Template"),
     LAYOUT("Layout"),
     PHOTO("Foto"),
     BORDER("Bingkai"),
+    BACKGROUND("Latar"),
     FILTER("Filter"),
     TEXT("Teks"),
     STICKER("Sticker"),
@@ -197,6 +201,63 @@ class EditorViewModel : ViewModel() {
 
     fun selectText(id: String?) {
         _state.update { it.copy(selectedTextId = id) }
+    }
+
+    /** Terapkan preset template: layout, rasio, background, border, caption. */
+    fun applyTemplate(preset: TemplatePreset) {
+        val layout = Layouts.byId(preset.layoutId)
+        commit { st ->
+            val newSlots = MutableList<PhotoSlot?>(layout.count) { i ->
+                st.slots.getOrNull(i)
+            }
+            st.copy(
+                layout = layout,
+                slots = newSlots,
+                style = st.style.copy(
+                    aspectRatio = preset.aspectRatio,
+                    backgroundAsset = preset.backgroundAsset,
+                    border = st.style.border.copy(
+                        thickness = preset.borderThickness,
+                        color = preset.borderColor,
+                        cornerRadius = preset.cornerRadius,
+                        outerPadding = preset.outerPadding,
+                    ),
+                ),
+                texts = if (preset.caption.isBlank()) st.texts else st.texts + TextItem(
+                    id = UUID.randomUUID().toString(),
+                    text = preset.caption,
+                    x = 0.5f,
+                    y = preset.captionY,
+                    size = preset.captionSize,
+                    color = preset.captionColor,
+                    fontRes = preset.captionFontRes,
+                ),
+                selectedCell = null,
+            )
+        }
+    }
+
+    /** Set background dari aset; null berarti balik ke warna solid. */
+    fun setBackgroundAsset(asset: String?) {
+        _state.update { st ->
+            st.copy(style = st.style.copy(backgroundAsset = asset))
+        }
+    }
+
+    fun addStickerAsset(asset: String) {
+        commit { st ->
+            st.copy(
+                stickers = st.stickers + StickerItem(
+                    id = UUID.randomUUID().toString(),
+                    asset = asset,
+                ),
+                selectedStickerId = st.stickers.lastOrNull()?.id,
+            )
+        }
+    }
+
+    fun setTextFont(id: String, fontRes: String) {
+        updateText(id) { it.copy(fontRes = fontRes) }
     }
 
     fun addSticker(glyph: String) {

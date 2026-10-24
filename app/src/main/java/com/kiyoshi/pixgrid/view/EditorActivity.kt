@@ -22,39 +22,32 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.Wallpaper
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.GridView
-import androidx.compose.material.icons.filled.CropSquare
-import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material.icons.filled.TextFields
-import androidx.compose.material.icons.filled.EmojiEmotions
-import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.AspectRatio
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Brush
+import androidx.compose.material.icons.filled.CropSquare
+import androidx.compose.material.icons.filled.EmojiEmotions
+import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Redo
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.TextFields
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material.icons.filled.Wallpaper
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -70,14 +63,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kiyoshi.pixgrid.render.CompositeRenderer
+import com.kiyoshi.pixgrid.ui.AppleBlue
+import com.kiyoshi.pixgrid.ui.AppleIconButton
 import com.kiyoshi.pixgrid.ui.CanvasPreview
-import com.kiyoshi.pixgrid.ui.Ink
-import com.kiyoshi.pixgrid.ui.Ink2
-import com.kiyoshi.pixgrid.ui.Ink3
-import com.kiyoshi.pixgrid.ui.Mist
-import com.kiyoshi.pixgrid.ui.Mist2
 import com.kiyoshi.pixgrid.ui.PixGridTheme
-import com.kiyoshi.pixgrid.ui.ToolButton
 import com.kiyoshi.pixgrid.ui.launchPhotoPicker
 import com.kiyoshi.pixgrid.ui.rememberPhotoPicker
 import com.kiyoshi.pixgrid.vm.EditorViewModel
@@ -112,34 +101,33 @@ fun EditorScreen(onClose: () -> Unit, vm: EditorViewModel = viewModel()) {
         vm.addPhotos(uris.map { it.toString() })
     }
 
-    fun doExport() {
+    fun renderNow(): android.graphics.Bitmap? = CompositeRenderer.render(
+        context = context,
+        layout = state.layout,
+        slots = state.slots,
+        canvasStyle = state.style,
+        texts = state.texts,
+        stickers = state.stickers,
+        doodles = state.doodles,
+        targetWidth = 1600,
+    )
+
+    fun doShare() {
         if (!state.slots.any { it != null }) {
             Toast.makeText(context, "Tambahkan foto dulu", Toast.LENGTH_SHORT).show()
             return
         }
         busy = true
         scope.launch {
-            val bmp = withContext(Dispatchers.Default) {
-                CompositeRenderer.render(
-                    context = context,
-                    layout = state.layout,
-                    slots = state.slots,
-                    canvasStyle = state.style,
-                    texts = state.texts,
-                    stickers = state.stickers,
-                    doodles = state.doodles,
-                    targetWidth = 1600,
-                )
-            }
-            val saved = withContext(Dispatchers.IO) {
+            val file = withContext(Dispatchers.Default) {
+                val bmp = renderNow() ?: return@withContext null
                 CompositeRenderer.saveToCache(context, bmp)
             }
             busy = false
-            if (saved != null) {
-                val uri = Uri.fromFile(saved)
+            if (file != null) {
                 val intent = Intent(Intent.ACTION_SEND).apply {
                     type = "image/png"
-                    putExtra(Intent.EXTRA_STREAM, uri)
+                    putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file))
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
                 context.startActivity(Intent.createChooser(intent, "Bagikan kolase"))
@@ -156,19 +144,8 @@ fun EditorScreen(onClose: () -> Unit, vm: EditorViewModel = viewModel()) {
         }
         busy = true
         scope.launch {
-            val bmp = withContext(Dispatchers.Default) {
-                CompositeRenderer.render(
-                    context = context,
-                    layout = state.layout,
-                    slots = state.slots,
-                    canvasStyle = state.style,
-                    texts = state.texts,
-                    stickers = state.stickers,
-                    doodles = state.doodles,
-                    targetWidth = 1600,
-                )
-            }
-            val uri = withContext(Dispatchers.IO) {
+            val uri = withContext(Dispatchers.Default) {
+                val bmp = renderNow() ?: return@withContext null
                 CompositeRenderer.saveToGallery(context, bmp)
             }
             busy = false
@@ -180,45 +157,58 @@ fun EditorScreen(onClose: () -> Unit, vm: EditorViewModel = viewModel()) {
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(Ink)) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
         Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
 
-            // Top bar
+            // ---- Navigation bar gaya iOS ----
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                    .height(48.dp)
+                    .padding(horizontal = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                IconButton(onClick = onClose) {
-                    Icon(Icons.Filled.ArrowBack, "Kembali", tint = Color(0xFFEDEDF2))
+                TextButton(onClick = onClose) {
+                    Text(
+                        "Batal",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
                 }
-                Spacer(Modifier.width(4.dp))
+                Spacer(Modifier.weight(1f))
                 Text(
                     text = "Editor",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = Color(0xFFEDEDF2),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onBackground,
                 )
                 Spacer(Modifier.weight(1f))
-                IconButton(onClick = { vm.undo() }) {
-                    Icon(Icons.Filled.Undo, "Urungkan", tint = Color(0xFFEDEDF2))
+                TextButton(onClick = { doShare() }) {
+                    Text(
+                        "Bagikan",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
                 }
-                IconButton(onClick = { vm.redo() }) {
-                    Icon(Icons.Filled.Redo, "Ulangi", tint = Color(0xFFEDEDF2))
-                }
-                IconButton(onClick = { doExport() }) {
-                    Icon(Icons.Filled.Share, "Bagikan", tint = Color(0xFFFFB347))
-                }
-                IconButton(onClick = { doSave() }) {
-                    Icon(Icons.Filled.Check, "Simpan", tint = Color(0xFFFF7A45))
+                TextButton(onClick = { doSave() }) {
+                    Text(
+                        "Simpan",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
                 }
             }
 
-            // Kanvas
+            // ---- Kanvas ----
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 18.dp),
+                    .padding(horizontal = 16.dp, vertical = 6.dp),
             ) {
                 CanvasPreview(
                     layout = state.layout,
@@ -230,8 +220,7 @@ fun EditorScreen(onClose: () -> Unit, vm: EditorViewModel = viewModel()) {
                     cornerRadius = state.style.border.cornerRadius,
                     onCellClick = { idx ->
                         vm.selectCell(idx)
-                        val slot = state.slots.getOrNull(idx)
-                        if (slot == null) {
+                        if (state.slots.getOrNull(idx) == null) {
                             launchPhotoPicker(picker)
                         } else {
                             vm.selectTool(Tool.PHOTO)
@@ -240,47 +229,61 @@ fun EditorScreen(onClose: () -> Unit, vm: EditorViewModel = viewModel()) {
                 )
             }
 
-            Spacer(Modifier.height(14.dp))
-
-            // Toolbar horizontal
-            LazyRow(
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp),
-                horizontalArrangement = Arrangement.spacedBy(2.dp),
-                modifier = Modifier.fillMaxWidth(),
+            // ---- Toolbar ----
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 2.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                items(Tool.entries.toList()) { tool ->
-                    ToolButton(
-                        icon = {
-                            ToolIcon(tool = tool, active = state.tool == tool)
-                        },
-                        label = tool.label,
-                        active = state.tool == tool,
-                        onClick = {
-                            vm.selectTool(tool)
-                            if (tool == Tool.PHOTO) {
-                                launchPhotoPicker(picker)
-                            }
-                        },
-                    )
+                AppleIconButton(
+                    icon = Icons.Filled.Undo,
+                    contentDescription = "Urungkan",
+                    tint = MaterialTheme.colorScheme.primary,
+                    onClick = { vm.undo() },
+                )
+                LazyRow(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
+                    items(Tool.entries.toList()) { tool ->
+                        ToolChip(
+                            tool = tool,
+                            active = state.tool == tool,
+                            onClick = {
+                                vm.selectTool(tool)
+                                if (tool == Tool.PHOTO) launchPhotoPicker(picker)
+                            },
+                        )
+                    }
                 }
+                AppleIconButton(
+                    icon = Icons.Filled.Redo,
+                    contentDescription = "Ulangi",
+                    tint = MaterialTheme.colorScheme.primary,
+                    onClick = { vm.redo() },
+                )
             }
 
-            Spacer(Modifier.height(10.dp))
-
-            // Panel bawah sesuai tool
+            // ---- Panel bawah: sheet gaya macOS ----
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-                    .background(Ink2)
+                    .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
+                    .background(MaterialTheme.colorScheme.surface)
+                    .border(
+                        0.5.dp,
+                        MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                        RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp),
+                    )
                     .navigationBarsPadding(),
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
-                        .padding(16.dp),
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
                 ) {
                     when (state.tool) {
                         Tool.TEMPLATE -> TemplatePanel(vm = vm)
@@ -292,34 +295,31 @@ fun EditorScreen(onClose: () -> Unit, vm: EditorViewModel = viewModel()) {
                             TextPanel(vm = vm, state = state, onAdd = { showTextDialog = true })
                             val sel = state.texts.firstOrNull { it.id == state.selectedTextId }
                                 ?: state.texts.lastOrNull()
-                            FontPickerPanel(
-                                vm = vm,
-                                textId = sel?.id,
-                                currentFont = sel?.fontRes ?: "",
-                            )
+                            Spacer(Modifier.height(16.dp))
+                            FontPickerPanel(vm = vm, textId = sel?.id, currentFont = sel?.fontRes ?: "")
                         }
                         Tool.STICKER -> StickerAssetPanel(vm = vm)
                         Tool.DOODLE -> DoodlePanel(vm = vm, state = state)
                         Tool.FORMAT -> FormatPanel(vm = vm, state = state)
                         Tool.LAYOUT -> LayoutPanel(vm = vm, state = state)
                     }
-                    Spacer(Modifier.height(20.dp))
+                    Spacer(Modifier.height(24.dp))
                 }
 
                 if (busy) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Color(0xCC0A0A0F)),
+                            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.92f)),
                         contentAlignment = Alignment.Center,
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            CircularProgressIndicator(color = Color(0xFFFF7A45))
+                            CircularProgressIndicator(color = AppleBlue)
                             Spacer(Modifier.height(12.dp))
                             Text(
-                                "Merender kolase…",
+                                "Membuat gambar…",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = Mist,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     }
@@ -337,7 +337,6 @@ fun EditorScreen(onClose: () -> Unit, vm: EditorViewModel = viewModel()) {
                     value = textInput,
                     onValueChange = { textInput = it },
                     placeholder = { Text("Tulis sesuatu…") },
-                    singleLine = false,
                     maxLines = 3,
                 )
             },
@@ -356,11 +355,12 @@ fun EditorScreen(onClose: () -> Unit, vm: EditorViewModel = viewModel()) {
 }
 
 @Composable
-private fun ToolIcon(tool: Tool, active: Boolean) {
-    val tint = if (active) Color(0xFFFF7A45) else Mist
+private fun ToolChip(tool: Tool, active: Boolean, onClick: () -> Unit) {
+    val tint = if (active) MaterialTheme.colorScheme.primary
+    else MaterialTheme.colorScheme.onSurfaceVariant
     val icon = when (tool) {
-        Tool.TEMPLATE -> Icons.Filled.AutoAwesome
-        Tool.BACKGROUND -> Icons.Filled.Wallpaper
+        Tool.TEMPLATE -> Icons.Filled.Wallpaper
+        Tool.BACKGROUND -> Icons.Filled.Brush
         Tool.LAYOUT -> Icons.Filled.GridView
         Tool.PHOTO -> Icons.Filled.Image
         Tool.BORDER -> Icons.Filled.CropSquare
@@ -370,16 +370,36 @@ private fun ToolIcon(tool: Tool, active: Boolean) {
         Tool.DOODLE -> Icons.Filled.Brush
         Tool.FORMAT -> Icons.Filled.AspectRatio
     }
-    Icon(icon, tool.label, tint = tint, modifier = Modifier.size(20.dp))
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(
+                if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                else Color.Transparent
+            )
+            .clickable(onClick = onClick)
+            .padding(horizontal = 10.dp, vertical = 7.dp),
+    ) {
+        Icon(icon, tool.label, tint = tint, modifier = Modifier.size(19.dp))
+        Spacer(Modifier.height(3.dp))
+        Text(
+            text = tool.label,
+            style = MaterialTheme.typography.labelMedium,
+            color = tint,
+            maxLines = 1,
+        )
+    }
 }
 
+/** Label section gaya iOS grouped list. */
 @Composable
 internal fun SectionLabel(text: String) {
     Text(
-        text = text,
+        text = text.uppercase(),
         style = MaterialTheme.typography.labelMedium,
-        color = Mist2,
         fontWeight = FontWeight.SemiBold,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(bottom = 10.dp),
     )
 }

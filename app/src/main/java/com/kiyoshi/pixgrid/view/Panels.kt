@@ -42,11 +42,7 @@ import com.kiyoshi.pixgrid.filter.Filters
 import com.kiyoshi.pixgrid.model.AspectPresets
 import com.kiyoshi.pixgrid.model.Doodle
 import com.kiyoshi.pixgrid.model.Layouts
-import com.kiyoshi.pixgrid.ui.Ink3
-import com.kiyoshi.pixgrid.ui.Ink4
 import com.kiyoshi.pixgrid.ui.LayoutPicker
-import com.kiyoshi.pixgrid.ui.Mist
-import com.kiyoshi.pixgrid.ui.Mist2
 import com.kiyoshi.pixgrid.vm.EditorState
 import com.kiyoshi.pixgrid.vm.EditorViewModel
 import com.kiyoshi.pixgrid.vm.Tool
@@ -73,8 +69,8 @@ fun PhotoPanel(vm: EditorViewModel, state: EditorState, onPick: () -> Unit) {
             Button(
                 onClick = onPick,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFFF7A45),
-                    contentColor = Color(0xFF1A0A00),
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = Color.White,
                 ),
                 shape = RoundedCornerShape(12.dp),
             ) {
@@ -105,7 +101,7 @@ fun PhotoPanel(vm: EditorViewModel, state: EditorState, onPick: () -> Unit) {
             Text(
                 "Ketuk salah satu sel di kanvas untuk mengatur fotonya.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Mist,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             return
         }
@@ -222,7 +218,7 @@ fun FilterPanel(vm: EditorViewModel, state: EditorState) {
             Text(
                 "Ketuk sel di kanvas dulu, lalu pilih filter.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Mist,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         } else {
             val current = state.slots.getOrNull(idx)?.filterId ?: "none"
@@ -234,10 +230,10 @@ fun FilterPanel(vm: EditorViewModel, state: EditorState) {
                         modifier = Modifier
                             .width(72.dp)
                             .clip(RoundedCornerShape(12.dp))
-                            .background(if (active) Color(0xFF3A1A08) else Ink3)
+                            .background(if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f) else MaterialTheme.colorScheme.surfaceVariant)
                             .border(
                                 if (active) 1.5.dp else 0.dp,
-                                if (active) Color(0xFFFF7A45) else Color.Transparent,
+                                if (active) MaterialTheme.colorScheme.primary else Color.Transparent,
                                 RoundedCornerShape(12.dp),
                             )
                             .clickable {
@@ -248,7 +244,7 @@ fun FilterPanel(vm: EditorViewModel, state: EditorState) {
                         Text(
                             text = f.label,
                             style = MaterialTheme.typography.labelMedium,
-                            color = if (active) Color(0xFFFFB347) else Mist,
+                            color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
                         )
                     }
@@ -281,8 +277,8 @@ fun TextPanel(
         Button(
             onClick = onAdd,
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFFF7A45),
-                contentColor = Color(0xFF1A0A00),
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = Color.White,
             ),
             shape = RoundedCornerShape(12.dp),
         ) {
@@ -300,10 +296,13 @@ fun TextPanel(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(10.dp))
-                        .background(if (selected) Color(0xFF3A1A08) else Ink3)
+                        .background(
+                            if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                            else MaterialTheme.colorScheme.surfaceVariant
+                        )
                         .border(
                             if (selected) 1.5.dp else 0.dp,
-                            if (selected) Color(0xFFFF7A45) else Color.Transparent,
+                            if (selected) MaterialTheme.colorScheme.primary else Color.Transparent,
                             RoundedCornerShape(10.dp),
                         )
                         .clickable { vm.selectText(t.id) }
@@ -313,14 +312,14 @@ fun TextPanel(
                     Text(
                         text = t.text,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color(0xFFEDEDF2),
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.weight(1f),
                         maxLines = 1,
                     )
                     Icon(
                         Icons.Filled.Delete,
                         "Hapus",
-                        tint = Mist2,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier
                             .size(18.dp)
                             .clickable { vm.removeText(t.id) },
@@ -353,7 +352,7 @@ fun StickerPanel(vm: EditorViewModel, state: EditorState) {
                             .weight(1f)
                             .height(46.dp)
                             .clip(RoundedCornerShape(10.dp))
-                            .background(Ink3)
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
                             .clickable { vm.addSticker(glyph) },
                         contentAlignment = Alignment.Center,
                     ) {
@@ -381,7 +380,7 @@ fun DoodlePanel(vm: EditorViewModel, state: EditorState) {
         Text(
             "Gores di kanvas untuk mencoret. Fitur coret aktif saat panel ini terbuka.",
             style = MaterialTheme.typography.bodyMedium,
-            color = Mist,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Spacer(Modifier.height(14.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -406,10 +405,10 @@ fun FormatPanel(vm: EditorViewModel, state: EditorState) {
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(12.dp))
-                        .background(if (active) Color(0xFF3A1A08) else Ink3)
+                        .background(if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f) else MaterialTheme.colorScheme.surfaceVariant)
                         .border(
                             if (active) 1.5.dp else 0.dp,
-                            if (active) Color(0xFFFF7A45) else Color.Transparent,
+                            if (active) MaterialTheme.colorScheme.primary else Color.Transparent,
                             RoundedCornerShape(12.dp),
                         )
                         .clickable { vm.setStyle { it.copy(aspectRatio = ratio) } }
@@ -418,7 +417,7 @@ fun FormatPanel(vm: EditorViewModel, state: EditorState) {
                     Text(
                         text = label,
                         style = MaterialTheme.typography.labelLarge,
-                        color = if (active) Color(0xFFFFB347) else Mist,
+                        color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
@@ -456,12 +455,12 @@ private fun SliderRow(
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyMedium,
-                color = Mist,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
                 text = String.format("%.2f", value),
                 style = MaterialTheme.typography.labelMedium,
-                color = Mist2,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         Slider(
@@ -470,9 +469,9 @@ private fun SliderRow(
             onValueChangeFinished = onValueChangeFinished,
             valueRange = range,
             colors = SliderDefaults.colors(
-                thumbColor = Color(0xFFFF7A45),
-                activeTrackColor = Color(0xFFFF7A45),
-                inactiveTrackColor = Ink4,
+                thumbColor = MaterialTheme.colorScheme.primary,
+                activeTrackColor = MaterialTheme.colorScheme.primary,
+                inactiveTrackColor = MaterialTheme.colorScheme.outline,
             ),
         )
     }
@@ -487,17 +486,17 @@ private fun ActionChip(
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(12.dp))
-            .background(Ink3)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .clickable(onClick = onClick)
             .padding(horizontal = 14.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(icon, null, tint = Color(0xFFFFB347), modifier = Modifier.size(17.dp))
+        Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(17.dp))
         Spacer(Modifier.width(8.dp))
         Text(
             text = label,
             style = MaterialTheme.typography.labelLarge,
-            color = Color(0xFFEDEDF2),
+            color = MaterialTheme.colorScheme.onSurface,
         )
     }
 }
@@ -507,14 +506,14 @@ private fun TextButtonRow(label: String, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(10.dp))
-            .background(Ink3)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .clickable(onClick = onClick)
             .padding(horizontal = 14.dp, vertical = 10.dp),
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
-            color = Color(0xFFFF7A45),
+            color = MaterialTheme.colorScheme.primary,
         )
     }
 }
@@ -526,12 +525,16 @@ private fun ColorRow(
 ) {
     val palette = listOf(
         Color.White,
-        Color(0xFF0A0A0F),
-        Color(0xFFFF7A45),
-        Color(0xFFFFB347),
-        Color(0xFF8A7CFF),
-        Color(0xFF3ECF8E),
-        Color(0xFFFF5A5A),
+        Color(0xFF1D1D1F),
+        Color(0xFF8E8E93),
+        Color(0xFF007AFF),
+        Color(0xFF5856D6),
+        Color(0xFFAF52DE),
+        Color(0xFFFF2D55),
+        Color(0xFFFF9500),
+        Color(0xFFFFCC00),
+        Color(0xFF34C759),
+        Color(0xFF30B0C7),
         Color(0xFFF2E9DC),
         Color(0xFF1E3A5F),
         Color(0xFF4A2E1F),
@@ -546,7 +549,7 @@ private fun ColorRow(
                     .background(c)
                     .border(
                         if (active) 2.5.dp else 1.dp,
-                        if (active) Color(0xFFFF7A45) else Ink4,
+                        if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                         CircleShape,
                     )
                     .clickable { onSelect(c) },

@@ -38,9 +38,6 @@ import com.kiyoshi.pixgrid.model.AllStickers
 import com.kiyoshi.pixgrid.model.BundledStickers
 import com.kiyoshi.pixgrid.model.BundledStickers2
 import com.kiyoshi.pixgrid.model.BundledTemplates
-import com.kiyoshi.pixgrid.ui.Ink3
-import com.kiyoshi.pixgrid.ui.Mist
-import com.kiyoshi.pixgrid.ui.Mist2
 import com.kiyoshi.pixgrid.vm.EditorViewModel
 
 /** Pilih template siap pakai. */
@@ -54,7 +51,7 @@ fun TemplatePanel(vm: EditorViewModel) {
                     modifier = Modifier
                         .width(110.dp)
                         .clip(RoundedCornerShape(14.dp))
-                        .background(Ink3)
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
                         .clickable { vm.applyTemplate(preset) }
                         .padding(8.dp),
                 ) {
@@ -63,7 +60,7 @@ fun TemplatePanel(vm: EditorViewModel) {
                             .fillMaxWidth()
                             .height(84.dp)
                             .clip(RoundedCornerShape(10.dp))
-                            .background(Color(0xFF1A1A22)),
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
                     ) {
                         val bg = preset.backgroundAsset
                         if (bg != null) {
@@ -79,7 +76,7 @@ fun TemplatePanel(vm: EditorViewModel) {
                     Text(
                         text = preset.label,
                         style = MaterialTheme.typography.labelMedium,
-                        color = Color(0xFFEDEDF2),
+                        color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                     )
                 }
@@ -102,10 +99,10 @@ fun BackgroundPanel(vm: EditorViewModel, currentAsset: String?) {
                     modifier = Modifier
                         .width(74.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(if (active) Color(0xFF3A1A08) else Ink3)
+                        .background(if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f) else MaterialTheme.colorScheme.surfaceVariant)
                         .border(
                             if (active) 1.5.dp else 0.dp,
-                            if (active) Color(0xFFFF7A45) else Color.Transparent,
+                            if (active) MaterialTheme.colorScheme.primary else Color.Transparent,
                             RoundedCornerShape(12.dp),
                         )
                         .clickable { vm.setBackgroundAsset(bg.asset) }
@@ -131,7 +128,7 @@ fun BackgroundPanel(vm: EditorViewModel, currentAsset: String?) {
                     Text(
                         text = bg.label,
                         style = MaterialTheme.typography.labelMedium,
-                        color = if (active) Color(0xFFFFB347) else Mist,
+                        color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                     )
                 }
@@ -157,7 +154,7 @@ fun StickerAssetPanel(vm: EditorViewModel) {
                             .weight(1f)
                             .height(52.dp)
                             .clip(RoundedCornerShape(10.dp))
-                            .background(Ink3)
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
                             .clickable { vm.addStickerAsset(st.asset) },
                         contentAlignment = Alignment.Center,
                     ) {
@@ -186,7 +183,7 @@ fun StickerAssetPanel(vm: EditorViewModel) {
                             .weight(1f)
                             .height(52.dp)
                             .clip(RoundedCornerShape(10.dp))
-                            .background(Ink3)
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
                             .clickable { vm.addStickerAsset(st.asset) },
                         contentAlignment = Alignment.Center,
                     ) {
@@ -217,7 +214,7 @@ fun FontPickerPanel(
             Text(
                 "Tambahkan teks dulu, lalu pilih font.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Mist,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             return@Column
         }
@@ -227,10 +224,10 @@ fun FontPickerPanel(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(12.dp))
-                        .background(if (active) Color(0xFF3A1A08) else Ink3)
+                        .background(if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f) else MaterialTheme.colorScheme.surfaceVariant)
                         .border(
                             if (active) 1.5.dp else 0.dp,
-                            if (active) Color(0xFFFF7A45) else Color.Transparent,
+                            if (active) MaterialTheme.colorScheme.primary else Color.Transparent,
                             RoundedCornerShape(12.dp),
                         )
                         .clickable { vm.setTextFont(textId, f.resName) }
@@ -238,7 +235,7 @@ fun FontPickerPanel(
                 ) {
                     Text(
                         text = f.label,
-                        color = if (active) Color(0xFFFFB347) else Mist2,
+                        color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                         style = fontStyleFor(f.resName),
                     )
                 }

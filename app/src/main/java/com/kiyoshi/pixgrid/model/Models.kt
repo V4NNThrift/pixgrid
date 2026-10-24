@@ -73,7 +73,7 @@ data class StickerItem(
 data class Doodle(
     val id: String,
     val points: List<Pair<Float, Float>>,
-    val color: Color = Color(0xFFFF7A45),
+    val color: Color = Color(0xFF007AFF),
     val width: Float = 0.008f,
     val eraser: Boolean = false,
 )

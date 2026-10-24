@@ -12,105 +12,143 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-// Palette: gelap hangat, aksen oranye-amber, sekunder ungu lembut
-val Ember = Color(0xFFFF7A45)
-val Amber = Color(0xFFFFB347)
-val Violet = Color(0xFF8A7CFF)
-val Ink = Color(0xFF0A0A0F)
-val Ink2 = Color(0xFF12121A)
-val Ink3 = Color(0xFF1B1B26)
-val Ink4 = Color(0xFF262633)
-val Mist = Color(0xFF9A9AAE)
-val Mist2 = Color(0xFF6E6E82)
+/*
+ * Palette mengikuti Apple Human Interface Guidelines (System Colors).
+ * Nilai hex diambil dari spesifikasi resmi, bukan tebakan.
+ */
 
-private val DarkColors = darkColorScheme(
-    primary = Ember,
-    onPrimary = Color(0xFF1A0A00),
-    primaryContainer = Color(0xFF3A1A08),
-    onPrimaryContainer = Amber,
-    secondary = Violet,
-    onSecondary = Color(0xFF0A0A18),
-    tertiary = Amber,
-    onTertiary = Color(0xFF1A1000),
-    background = Ink,
-    onBackground = Color(0xFFF2F2F5),
-    surface = Ink2,
-    onSurface = Color(0xFFF2F2F5),
-    surfaceVariant = Ink3,
-    onSurfaceVariant = Mist,
-    outline = Ink4,
-    outlineVariant = Color(0xFF2E2E3D),
-    error = Color(0xFFFF5A5A),
-    onError = Color(0xFF2A0000),
-)
+// --- System accent ---
+val AppleBlue = Color(0xFF007AFF)
+val AppleBlueDark = Color(0xFF0A84FF)
+val AppleIndigo = Color(0xFF5856D6)
+val ApplePurple = Color(0xFFAF52DE)
+val ApplePink = Color(0xFFFF2D55)
+val AppleRed = Color(0xFFFF3B30)
+val AppleOrange = Color(0xFFFF9500)
+val AppleYellow = Color(0xFFFFCC00)
+val AppleGreen = Color(0xFF34C759)
+val AppleTeal = Color(0xFF30B0C7)
+val AppleMint = Color(0xFF00C7BE)
 
-private val LightColors = lightColorScheme(
-    primary = Color(0xFFD65A20),
+// --- macOS light ---
+val WindowLight = Color(0xFFF5F5F7)
+val SidebarLight = Color(0xFFEBEBED)
+val CardLight = Color(0xFFFFFFFF)
+val SeparatorLight = Color(0xFFD8D8DC)
+val TextPrimaryLight = Color(0xFF1D1D1F)
+val TextSecondaryLight = Color(0xFF6E6E73)
+val TextTertiaryLight = Color(0xFFAEAEB2)
+
+// --- macOS dark ---
+val WindowDark = Color(0xFF1C1C1E)
+val SidebarDark = Color(0xFF2C2C2E)
+val CardDark = Color(0xFF2C2C2E)
+val CardDarkAlt = Color(0xFF3A3A3C)
+val SeparatorDark = Color(0xFF38383A)
+val TextPrimaryDark = Color(0xFFF5F5F7)
+val TextSecondaryDark = Color(0xFF98989D)
+val TextTertiaryDark = Color(0xFF636366)
+
+private val LightScheme = lightColorScheme(
+    primary = AppleBlue,
     onPrimary = Color.White,
-    primaryContainer = Color(0xFFFFE3D6),
-    onPrimaryContainer = Color(0xFF3A1300),
-    secondary = Color(0xFF5B4FD6),
+    primaryContainer = Color(0xFFDCEBFF),
+    onPrimaryContainer = Color(0xFF003A75),
+    secondary = AppleIndigo,
     onSecondary = Color.White,
-    tertiary = Color(0xFFB87300),
+    tertiary = AppleTeal,
     onTertiary = Color.White,
-    background = Color(0xFFFAF9FB),
-    onBackground = Color(0xFF1A1A22),
-    surface = Color.White,
-    onSurface = Color(0xFF1A1A22),
-    surfaceVariant = Color(0xFFF0EEF3),
-    onSurfaceVariant = Color(0xFF5E5E70),
-    outline = Color(0xFFD6D4DC),
-    outlineVariant = Color(0xFFE6E4EC),
-    error = Color(0xFFB3261E),
+    background = WindowLight,
+    onBackground = TextPrimaryLight,
+    surface = CardLight,
+    onSurface = TextPrimaryLight,
+    surfaceVariant = SidebarLight,
+    onSurfaceVariant = TextSecondaryLight,
+    outline = SeparatorLight,
+    outlineVariant = Color(0xFFE5E5EA),
+    error = AppleRed,
     onError = Color.White,
 )
 
-private val AppTypography = Typography(
+private val DarkScheme = darkColorScheme(
+    primary = AppleBlueDark,
+    onPrimary = Color.White,
+    primaryContainer = Color(0xFF0A3A6B),
+    onPrimaryContainer = Color(0xFFB8D8FF),
+    secondary = Color(0xFF7A78E8),
+    onSecondary = Color.White,
+    tertiary = Color(0xFF4AD0DE),
+    onTertiary = Color(0xFF00201F),
+    background = WindowDark,
+    onBackground = TextPrimaryDark,
+    surface = CardDark,
+    onSurface = TextPrimaryDark,
+    surfaceVariant = CardDarkAlt,
+    onSurfaceVariant = TextSecondaryDark,
+    outline = SeparatorDark,
+    outlineVariant = SeparatorDark,
+    error = Color(0xFFFF453A),
+    onError = Color.White,
+)
+
+/*
+ * San Francisco tidak boleh dibundel (lisensi platform Apple).
+ * Font sistem Android (Roboto) adalah pengganti terdekat secara metrik.
+ * Skala ukuran mengikuti HIG: 11 / 13 / 15 / 17 / 20 / 22 / 28 / 34.
+ */
+private val AppleType = Typography(
     displaySmall = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Bold,
         fontSize = 32.sp,
-        letterSpacing = (-0.5).sp,
+        letterSpacing = (-0.8).sp,
+        lineHeight = 36.sp,
     ),
     headlineMedium = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.SemiBold,
         fontSize = 24.sp,
-        letterSpacing = (-0.3).sp,
+        letterSpacing = (-0.5).sp,
+        lineHeight = 30.sp,
     ),
     titleLarge = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.SemiBold,
         fontSize = 19.sp,
+        letterSpacing = (-0.3).sp,
+        lineHeight = 24.sp,
     ),
     titleMedium = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
+        letterSpacing = (-0.2).sp,
+        lineHeight = 21.sp,
     ),
     bodyLarge = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Normal,
         fontSize = 15.sp,
-        lineHeight = 21.sp,
+        letterSpacing = (-0.2).sp,
+        lineHeight = 20.sp,
     ),
     bodyMedium = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Normal,
         fontSize = 13.sp,
+        letterSpacing = (-0.1).sp,
         lineHeight = 18.sp,
     ),
     labelLarge = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = FontWeight.Medium,
         fontSize = 13.sp,
-        letterSpacing = 0.2.sp,
+        letterSpacing = (-0.1).sp,
     ),
     labelMedium = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Medium,
         fontSize = 11.sp,
-        letterSpacing = 0.3.sp,
     ),
 )
 
@@ -120,8 +158,8 @@ fun PixGridTheme(
     content: @Composable () -> Unit,
 ) {
     MaterialTheme(
-        colorScheme = if (darkTheme) DarkColors else LightColors,
-        typography = AppTypography,
+        colorScheme = if (darkTheme) DarkScheme else LightScheme,
+        typography = AppleType,
         content = content,
     )
 }

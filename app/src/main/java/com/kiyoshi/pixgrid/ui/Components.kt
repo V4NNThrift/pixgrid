@@ -76,10 +76,10 @@ fun CanvasPreview(
                         modifier = Modifier
                             .fillMaxSize()
                             .clip(RoundedCornerShape(radius))
-                            .background(if (slot == null) Color(0xFF1E1E2A) else Color(0xFF101018))
+                            .background(if (slot == null) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface)
                             .border(
                                 0.8.dp,
-                                if (slot == null) Color(0xFF2E2E3D) else borderColor.copy(alpha = 0.3f),
+                                if (slot == null) MaterialTheme.colorScheme.outline else borderColor.copy(alpha = 0.3f),
                                 RoundedCornerShape(radius)
                             )
                             .clickable { onCellClick(index) },
@@ -96,7 +96,7 @@ fun CanvasPreview(
                             Icon(
                                 Icons.Filled.Add,
                                 contentDescription = "Tambah foto",
-                                tint = Mist2,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(22.dp),
                             )
                         }
@@ -198,7 +198,7 @@ fun LayoutPicker(
 
 @Composable
 fun MiniLayout(layout: GridLayout, active: Boolean) {
-    val tint = if (active) MaterialTheme.colorScheme.primary else Mist2
+    val tint = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
     Box(modifier = Modifier.fillMaxWidth().aspectRatio(1f)) {
         FractionalLayout(layout = layout, gap = 0.02f) {
             layout.cells.forEach { _ ->

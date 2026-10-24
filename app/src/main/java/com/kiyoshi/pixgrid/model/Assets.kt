@@ -383,3 +383,40 @@ val BundledTemplates: List<TemplatePreset> = listOf(
         "mekar", "lobster_regular", Color(0xFFFFF0F8), 0.075f, 0.94f,
     ),
 )
+
+/** Sticker set kedua: outline & ikon gaya doodle. */
+val BundledStickers2: List<StickerAsset> = listOf(
+    "circle_out" to "Lingkaran",
+    "square_out" to "Kotak",
+    "heart_out" to "Hati Garis",
+    "star_out" to "Bintang Garis",
+    "crown_out" to "Mahkota Garis",
+    "plus" to "Plus",
+    "minus" to "Minus",
+    "arrow_right" to "Panah",
+    "arrow_up" to "Panah Atas",
+    "smile" to "Senyum",
+    "wink" to "Kedip",
+    "sad" to "Sedih",
+    "surprise" to "Kaget",
+    "sun" to "Matahari",
+    "moon" to "Bulan",
+    "rainbow" to "Pelangi",
+    "music" to "Musik",
+    "camera" to "Kamera",
+    "pin" to "Pin",
+    "gift" to "Hadiah",
+    "cake" to "Kue",
+    "coffee" to "Kopi",
+    "pizza" to "Pizza",
+    "planet" to "Planet",
+    "rocket" to "Roket",
+    "bulb" to "Ide",
+    "bulb_on" to "Ide Nyala",
+    "diamond" to "Berlian",
+    "spade" to "Sekop",
+    "note" to "Catatan",
+).map { (id, label) -> StickerAsset(id, label, "stickers_png/set2/$id.png") }
+
+/** Semua sticker (set 1 + set 2). */
+val AllStickers: List<StickerAsset> get() = BundledStickers + BundledStickers2

@@ -34,7 +34,9 @@ import coil.compose.AsyncImage
 import com.kiyoshi.pixgrid.R
 import com.kiyoshi.pixgrid.model.BundledBackgrounds
 import com.kiyoshi.pixgrid.model.BundledFonts
+import com.kiyoshi.pixgrid.model.AllStickers
 import com.kiyoshi.pixgrid.model.BundledStickers
+import com.kiyoshi.pixgrid.model.BundledStickers2
 import com.kiyoshi.pixgrid.model.BundledTemplates
 import com.kiyoshi.pixgrid.ui.Ink3
 import com.kiyoshi.pixgrid.ui.Mist
@@ -142,9 +144,38 @@ fun BackgroundPanel(vm: EditorViewModel, currentAsset: String?) {
 @Composable
 fun StickerAssetPanel(vm: EditorViewModel) {
     Column {
-        SectionLabel("STICKER")
+        SectionLabel("STICKER · ${AllStickers.size} PILIHAN")
         val rows = BundledStickers.chunked(6)
         rows.forEach { row ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                row.forEach { st ->
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(52.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(Ink3)
+                            .clickable { vm.addStickerAsset(st.asset) },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        AsyncImage(
+                            model = "file:///android_asset/${st.asset}",
+                            contentDescription = st.label,
+                            modifier = Modifier.size(38.dp),
+                        )
+                    }
+                }
+                repeat(6 - row.size) { Spacer(Modifier.weight(1f)) }
+            }
+            Spacer(Modifier.height(8.dp))
+        }
+
+        Spacer(Modifier.height(10.dp))
+        SectionLabel("GARIS & IKON")
+        BundledStickers2.chunked(6).forEach { row ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),

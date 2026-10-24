@@ -50,7 +50,9 @@ import com.kiyoshi.pixgrid.ui.Mist
 fun HomeScreen() {
     val context = LocalContext.current
     var selectedLayoutId by remember { mutableStateOf<String?>(null) }
-    val openEditor = { Intent(context, EditorActivity::class.java).also { context.startActivity(it) } }
+    val openEditor: () -> Unit = {
+        context.startActivity(Intent(context, EditorActivity::class.java))
+    }
 
     Box(
         modifier = Modifier

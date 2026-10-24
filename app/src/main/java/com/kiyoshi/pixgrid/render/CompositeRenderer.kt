@@ -5,10 +5,12 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
-import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Matrix
 import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
 import android.graphics.RectF
 import android.os.Build
 import android.os.Environment
@@ -23,7 +25,6 @@ import com.kiyoshi.pixgrid.model.StickerItem
 import com.kiyoshi.pixgrid.model.TextItem
 import java.io.File
 import java.io.FileOutputStream
-import java.io.InputStream
 import kotlin.math.max
 import kotlin.math.min
 
@@ -46,19 +47,19 @@ object CompositeRenderer {
         reqWidth: Int,
         reqHeight: Int,
     ): Bitmap? {
-        val key = "$uri@$reqWidth x$reqHeight"
+        val key = "$uri@${reqWidth}x$reqHeight"
         bitmapCache[key]?.let { if (!it.isRecycled) return it }
 
         return try {
-            val opts = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
             context.contentResolver.openInputStream(android.net.Uri.parse(uri))?.use {
-                BitmapFactory.decodeStream(it, null, opts)
+                BitmapFactory.decodeStream(it, null, bounds)
             }
-            if (opts.outWidth <= 0 || opts.outHeight <= 0) return null
+            if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
 
             var sample = 1
-            while (opts.outWidth / (sample * 2) >= reqWidth &&
-                opts.outHeight / (sample * 2) >= reqHeight
+            while (bounds.outWidth / (sample * 2) >= reqWidth &&
+                bounds.outHeight / (sample * 2) >= reqHeight
             ) {
                 sample *= 2
             }
@@ -82,13 +83,14 @@ object CompositeRenderer {
 
     private fun applyExif(context: Context, uri: String, bmp: Bitmap): Bitmap {
         return try {
-            val stream: InputStream? = context.contentResolver.openInputStream(android.net.Uri.parse(uri))
-            val orientation = stream?.use {
-                ExifInterface(it).getAttributeInt(
-                    ExifInterface.TAG_ORIENTATION,
-                    ExifInterface.ORIENTATION_NORMAL
-                )
-            } ?: ExifInterface.ORIENTATION_NORMAL
+            val orientation = context.contentResolver
+                .openInputStream(android.net.Uri.parse(uri))
+                ?.use {
+                    ExifInterface(it).getAttributeInt(
+                        ExifInterface.TAG_ORIENTATION,
+                        ExifInterface.ORIENTATION_NORMAL
+                    )
+                } ?: ExifInterface.ORIENTATION_NORMAL
 
             val m = Matrix()
             when (orientation) {
@@ -98,10 +100,12 @@ object CompositeRenderer {
                 ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> m.postScale(-1f, 1f)
                 ExifInterface.ORIENTATION_FLIP_VERTICAL -> m.postScale(1f, -1f)
                 ExifInterface.ORIENTATION_TRANSPOSE -> {
-                    m.postRotate(90f); m.postScale(-1f, 1f)
+                    m.postRotate(90f)
+                    m.postScale(-1f, 1f)
                 }
                 ExifInterface.ORIENTATION_TRANSVERSE -> {
-                    m.postRotate(270f); m.postScale(-1f, 1f)
+                    m.postRotate(270f)
+                    m.postScale(-1f, 1f)
                 }
             }
             if (m.isIdentity) bmp
@@ -114,20 +118,19 @@ object CompositeRenderer {
 
     /**
      * Render komposisi ke Bitmap.
-     * @param targetWidth lebar output; tinggi dihitung dari aspect ratio style.
      */
     fun render(
         context: Context,
         layout: GridLayout,
         slots: List<PhotoSlot?>,
-        style: CanvasStyle,
+        canvasStyle: CanvasStyle,
         texts: List<TextItem>,
         stickers: List<StickerItem>,
         doodles: List<Doodle>,
         targetWidth: Int = 1080,
     ): Bitmap {
         val w = targetWidth.coerceIn(240, EXPORT_MAX)
-        val h = (w / style.aspectRatio).toInt().coerceIn(240, EXPORT_MAX)
+        val h = (w / canvasStyle.aspectRatio).toInt().coerceIn(240, EXPORT_MAX)
 
         val out = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(out)
@@ -135,30 +138,31 @@ object CompositeRenderer {
         val fh = h.toFloat()
 
         // Latar belakang
-        val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = style.background }
+        val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        bgPaint.color = canvasStyle.background.toArgbInt()
         canvas.drawRect(0f, 0f, fw, fh, bgPaint)
 
-        // Blur latar dari foto pertama (opsional)
-        if (style.backgroundBlur) {
+        // Blur latar dari foto pertama
+        if (canvasStyle.backgroundBlur) {
             val first = slots.firstOrNull { it != null }
             if (first != null) {
                 val bmp = decodeSampled(context, first.uri, w / 4, h / 4)
                 if (bmp != null) {
-                    val tiny = Bitmap.createScaledBitmap(
-                        bmp, max(1, w / 16), max(1, h / 16), true
-                    )
-                    val blurred = tiny
-                    val dst = RectF(0f, 0f, fw, fh)
-                    canvas.drawBitmap(blurred, null, dst, Paint().apply { alpha = 150 })
-                    if (blurred !== bmp) blurred.recycle()
+                    val tinyW = max(1, w / 18)
+                    val tinyH = max(1, h / 18)
+                    val tiny = Bitmap.createScaledBitmap(bmp, tinyW, tinyH, true)
+                    val blurPaint = Paint(Paint.FILTER_BITMAP_FLAG or Paint.ANTI_ALIAS_FLAG)
+                    blurPaint.alpha = 160
+                    canvas.drawBitmap(tiny, null, RectF(0f, 0f, fw, fh), blurPaint)
+                    if (tiny !== bmp) tiny.recycle()
                 }
             }
         }
 
         val shortest = min(fw, fh)
-        val outer = style.border.outerPadding * shortest
-        val thickness = style.border.thickness * shortest
-        val radius = style.border.cornerRadius * shortest
+        val outer = canvasStyle.border.outerPadding * shortest
+        val thickness = canvasStyle.border.thickness * shortest
+        val radius = canvasStyle.border.cornerRadius * shortest
 
         val contentW = fw - outer * 2
         val contentH = fh - outer * 2
@@ -172,7 +176,6 @@ object CompositeRenderer {
             val cellW = cell.w * contentW
             val cellH = cell.h * contentH
 
-            // inset border
             val inset = thickness / 2f
             val ix = cellLeft + inset
             val iy = cellTop + inset
@@ -183,31 +186,32 @@ object CompositeRenderer {
             val rect = RectF(ix, iy, ix + iw, iy + ih)
 
             canvas.save()
-            if (radius > 0f) {
-                val path = android.graphics.Path().apply {
-                    addRoundRect(rect, radius, radius, android.graphics.Path.Direction.CW)
-                }
-                canvas.clipPath(path)
-            } else {
-                canvas.clipRect(rect)
-            }
+            val clipPath = Path()
+            clipPath.addRoundRect(rect, radius, radius, Path.Direction.CW)
+            canvas.clipPath(clipPath)
 
-            val bmp = decodeSampled(context, slot.uri, iw.toInt().coerceAtLeast(1), ih.toInt().coerceAtLeast(1))
+            val bmp = decodeSampled(
+                context, slot.uri,
+                iw.toInt().coerceAtLeast(1),
+                ih.toInt().coerceAtLeast(1)
+            )
             if (bmp != null) {
                 drawSlotBitmap(canvas, bmp, slot, rect)
             } else {
-                canvas.drawRect(rect, Paint().apply { color = 0xFF1A1A22.toInt() })
+                val ph = Paint(Paint.ANTI_ALIAS_FLAG)
+                ph.color = 0xFF1A1A22.toInt()
+                canvas.drawRect(rect, ph)
             }
             canvas.restore()
         }
 
-        // Border overlay (garis di antara sel)
+        // Border overlay
         if (thickness > 0f) {
-            val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = style.border.color
-                style = Paint.Style.STROKE
-                strokeWidth = thickness
-            }
+            val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+            borderPaint.color = canvasStyle.border.color.toArgbInt()
+            borderPaint.setStyle(Paint.Style.STROKE)
+            borderPaint.strokeWidth = thickness
+
             layout.cells.forEach { cell ->
                 val cellLeft = outer + cell.x * contentW
                 val cellTop = outer + cell.y * contentH
@@ -219,70 +223,65 @@ object CompositeRenderer {
                     cellLeft + cellW - thickness / 2f,
                     cellTop + cellH - thickness / 2f
                 )
-                if (radius > 0f) {
-                    canvas.drawRoundRect(r, radius, radius, borderPaint)
-                } else {
-                    canvas.drawRect(r, borderPaint)
-                }
+                canvas.drawRoundRect(r, radius, radius, borderPaint)
             }
         }
 
         // Teks
         texts.forEach { t ->
-            val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = t.color
-                textSize = t.size * shortest
-                textAlign = Paint.Align.CENTER
-                isFakeBoldText = t.bold
-                textSkewX = if (t.italic) -0.25f else 0f
-                if (t.shadow) setShadowLayer(textSize * 0.12f, 0f, textSize * 0.05f, 0xAA000000.toInt())
+            val textPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+            textPaint.color = t.color.toArgbInt()
+            textPaint.textSize = t.size * shortest
+            textPaint.textAlign = Paint.Align.CENTER
+            textPaint.isFakeBoldText = t.bold
+            textPaint.textSkewX = if (t.italic) -0.25f else 0f
+            if (t.shadow) {
+                textPaint.setShadowLayer(
+                    textPaint.textSize * 0.12f, 0f, textPaint.textSize * 0.05f,
+                    0xAA000000.toInt()
+                )
             }
             canvas.save()
             canvas.rotate(t.rotation, t.x * fw, t.y * fh)
-            canvas.drawText(t.text, t.x * fw, t.y * fh, paint)
+            canvas.drawText(t.text, t.x * fw, t.y * fh, textPaint)
             canvas.restore()
         }
 
         // Sticker
         stickers.forEach { s ->
-            val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                textSize = s.size * shortest
-                textAlign = Paint.Align.CENTER
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    typeface = android.graphics.Typeface.DEFAULT
-                }
-            }
+            val stickerPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+            stickerPaint.textSize = s.size * shortest
+            stickerPaint.textAlign = Paint.Align.CENTER
             canvas.save()
             canvas.rotate(s.rotation, s.x * fw, s.y * fh)
-            canvas.drawText(s.glyph, s.x * fw, s.y * fh, paint)
+            canvas.drawText(s.glyph, s.x * fw, s.y * fh, stickerPaint)
             canvas.restore()
         }
 
         // Doodle
         doodles.forEach { d ->
             if (d.points.size < 2) return@forEach
-            val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                style = Paint.Style.STROKE
-                strokeCap = Paint.Cap.ROUND
-                strokeJoin = Paint.Join.ROUND
-                strokeWidth = d.width * shortest
-                color = d.color
-            }
+            val doodlePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+            doodlePaint.setStyle(Paint.Style.STROKE)
+            doodlePaint.strokeCap = Paint.Cap.ROUND
+            doodlePaint.strokeJoin = Paint.Join.ROUND
+
             if (d.eraser) {
-                paint.xfermode = android.graphics.PorterDuffXfermode(
-                    android.graphics.PorterDuff.Mode.CLEAR
-                )
-                paint.color = android.graphics.Color.TRANSPARENT
-                paint.strokeWidth = d.width * shortest * 2.5f
-                paint.style = Paint.Style.STROKE
+                doodlePaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
+                doodlePaint.color = android.graphics.Color.TRANSPARENT
+                doodlePaint.strokeWidth = d.width * shortest * 2.5f
+            } else {
+                doodlePaint.color = d.color.toArgbInt()
+                doodlePaint.strokeWidth = d.width * shortest
             }
-            val path = android.graphics.Path()
+
+            val path = Path()
             d.points.forEachIndexed { i, p ->
                 val px = p.first * fw
                 val py = p.second * fh
                 if (i == 0) path.moveTo(px, py) else path.lineTo(px, py)
             }
-            canvas.drawPath(path, paint)
+            canvas.drawPath(path, doodlePaint)
         }
 
         return out
@@ -294,15 +293,12 @@ object CompositeRenderer {
         slot: PhotoSlot,
         rect: RectF,
     ) {
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            isFilterBitmap = true
-            if (slot.filterId != "none") {
-                val cm = Filters.blended(slot.filterId, slot.filterStrength)
-                colorFilter = ColorMatrixColorFilter(cm)
-            }
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+        if (slot.filterId != "none") {
+            val cm = Filters.blended(slot.filterId, slot.filterStrength)
+            paint.colorFilter = ColorMatrixColorFilter(cm)
         }
 
-        // Crop area sumber
         val srcX = slot.cropX * bmp.width
         val srcY = slot.cropY * bmp.height
         val srcW = (slot.cropWidth * bmp.width).coerceAtLeast(1f)
@@ -316,7 +312,6 @@ object CompositeRenderer {
 
         canvas.save()
 
-        // Terapkan rotasi + flip + skala + offset di sekitar pusat sel
         val cx = rect.centerX()
         val cy = rect.centerY()
         canvas.rotate(slot.rotation, cx, cy)
@@ -334,15 +329,14 @@ object CompositeRenderer {
             rect.bottom + slot.offsetY * rect.height(),
         )
 
-        // Skala zoom di sekitar pusat
         if (slot.scale != 1f) {
             val w2 = drawRect.width() * slot.scale
             val h2 = drawRect.height() * slot.scale
             drawRect.set(
-                rect.centerX() - w2 / 2f,
-                rect.centerY() - h2 / 2f,
-                rect.centerX() + w2 / 2f,
-                rect.centerY() + h2 / 2f,
+                cx - w2 / 2f,
+                cy - h2 / 2f,
+                cx + w2 / 2f,
+                cy + h2 / 2f,
             )
         }
 
@@ -350,7 +344,16 @@ object CompositeRenderer {
         canvas.restore()
     }
 
-    /** Simpan bitmap ke galeri. Mengembalikan URI atau null jika gagal. */
+    /** Konversi Compose Color ke ARGB Int tanpa bergantung pada composable. */
+    private fun androidx.compose.ui.graphics.Color.toArgbInt(): Int {
+        val a = (alpha * 255f).toInt().coerceIn(0, 255)
+        val r = (red * 255f).toInt().coerceIn(0, 255)
+        val g = (green * 255f).toInt().coerceIn(0, 255)
+        val b = (blue * 255f).toInt().coerceIn(0, 255)
+        return (a shl 24) or (r shl 16) or (g shl 8) or b
+    }
+
+    /** Simpan ke galeri. */
     fun saveToGallery(context: Context, bitmap: Bitmap): android.net.Uri? {
         val name = "PixGrid_${System.currentTimeMillis()}.png"
         return try {
@@ -364,8 +367,8 @@ object CompositeRenderer {
                 val resolver = context.contentResolver
                 val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
                     ?: return null
-                resolver.openOutputStream(uri)?.use { out ->
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                resolver.openOutputStream(uri)?.use { outs ->
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outs)
                 } ?: return null
                 values.clear()
                 values.put(MediaStore.Images.Media.IS_PENDING, 0)
@@ -378,8 +381,8 @@ object CompositeRenderer {
                 )
                 if (!dir.exists()) dir.mkdirs()
                 val file = File(dir, name)
-                FileOutputStream(file).use { out ->
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                FileOutputStream(file).use { outs ->
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outs)
                 }
                 android.net.Uri.fromFile(file)
             }
@@ -388,14 +391,14 @@ object CompositeRenderer {
         }
     }
 
-    /** Simpan bitmap ke cache internal sebagai file (untuk share). */
+    /** Simpan ke cache untuk dibagikan. */
     fun saveToCache(context: Context, bitmap: Bitmap): File? {
         return try {
             val dir = File(context.cacheDir, "share")
             if (!dir.exists()) dir.mkdirs()
             val file = File(dir, "pixgrid_${System.currentTimeMillis()}.png")
-            FileOutputStream(file).use { out ->
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            FileOutputStream(file).use { outs ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outs)
             }
             file
         } catch (t: Throwable) {

@@ -31,6 +31,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.GridView
+import androidx.compose.material.icons.filled.CropSquare
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.TextFields
+import androidx.compose.material.icons.filled.EmojiEmotions
+import androidx.compose.material.icons.filled.Brush
+import androidx.compose.material.icons.filled.AspectRatio
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Redo
@@ -104,7 +111,7 @@ fun EditorScreen(onClose: () -> Unit, vm: EditorViewModel = viewModel()) {
     }
 
     fun doExport() {
-        if (!state.hasContent()) {
+        if (!state.slots.any { it != null }) {
             Toast.makeText(context, "Tambahkan foto dulu", Toast.LENGTH_SHORT).show()
             return
         }
@@ -115,7 +122,7 @@ fun EditorScreen(onClose: () -> Unit, vm: EditorViewModel = viewModel()) {
                     context = context,
                     layout = state.layout,
                     slots = state.slots,
-                    style = state.style,
+                    canvasStyle = state.style,
                     texts = state.texts,
                     stickers = state.stickers,
                     doodles = state.doodles,
@@ -141,7 +148,7 @@ fun EditorScreen(onClose: () -> Unit, vm: EditorViewModel = viewModel()) {
     }
 
     fun doSave() {
-        if (!state.hasContent()) {
+        if (!state.slots.any { it != null }) {
             Toast.makeText(context, "Tambahkan foto dulu", Toast.LENGTH_SHORT).show()
             return
         }
@@ -152,7 +159,7 @@ fun EditorScreen(onClose: () -> Unit, vm: EditorViewModel = viewModel()) {
                     context = context,
                     layout = state.layout,
                     slots = state.slots,
-                    style = state.style,
+                    canvasStyle = state.style,
                     texts = state.texts,
                     stickers = state.stickers,
                     doodles = state.doodles,
@@ -339,20 +346,20 @@ fun EditorScreen(onClose: () -> Unit, vm: EditorViewModel = viewModel()) {
 private fun ToolIcon(tool: Tool, active: Boolean) {
     val tint = if (active) Color(0xFFFF7A45) else Mist
     val icon = when (tool) {
-        Tool.LAYOUT -> androidx.compose.material.icons.filled.GridView
+        Tool.LAYOUT -> Icons.Filled.GridView
         Tool.PHOTO -> Icons.Filled.Image
-        Tool.BORDER -> androidx.compose.material.icons.filled.CropSquare
-        Tool.FILTER -> androidx.compose.material.icons.filled.Tune
-        Tool.TEXT -> androidx.compose.material.icons.filled.TextFields
-        Tool.STICKER -> androidx.compose.material.icons.filled.EmojiEmotions
-        Tool.DOODLE -> androidx.compose.material.icons.filled.Brush
-        Tool.FORMAT -> androidx.compose.material.icons.filled.AspectRatio
+        Tool.BORDER -> Icons.Filled.CropSquare
+        Tool.FILTER -> Icons.Filled.Tune
+        Tool.TEXT -> Icons.Filled.TextFields
+        Tool.STICKER -> Icons.Filled.EmojiEmotions
+        Tool.DOODLE -> Icons.Filled.Brush
+        Tool.FORMAT -> Icons.Filled.AspectRatio
     }
     Icon(icon, tool.label, tint = tint, modifier = Modifier.size(20.dp))
 }
 
 @Composable
-private fun SectionLabel(text: String) {
+internal fun SectionLabel(text: String) {
     Text(
         text = text,
         style = MaterialTheme.typography.labelMedium,

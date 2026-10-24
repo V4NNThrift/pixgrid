@@ -1,4 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
-<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#B39DFF"/><stop offset="1" stop-color="#6C4CE0"/></linearGradient></defs>
-<circle cx="100" cy="100" r="72" fill="url(#g)" stroke="#fff" stroke-width="6"/><circle cx="76" cy="84" r="11" fill="#2A2A3A"/><circle cx="124" cy="84" r="11" fill="#2A2A3A"/><ellipse cx="100" cy="126" rx="16" ry="20" fill="#2A2A3A"/>
-</svg>

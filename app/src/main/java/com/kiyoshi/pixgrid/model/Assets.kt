@@ -135,7 +135,30 @@ val BundledBackgrounds: List<BackgroundChoice> = listOf(
     BackgroundChoice("abstract_ember", "Abstrak Ember", "backgrounds/abstract_ember.webp"),
     BackgroundChoice("abstract_ocean", "Abstrak Ocean", "backgrounds/abstract_ocean.webp"),
     BackgroundChoice("abstract_lime", "Abstrak Lime", "backgrounds/abstract_lime.webp"),
+
+    // Tekstur baru
+    BackgroundChoice("wood_dark", "Kayu Gelap", "textures/wood_dark.webp", isTexture = true),
+    BackgroundChoice("mortar", "Semen", "textures/mortar.webp", isTexture = true),
+    BackgroundChoice("weave", "Tenun", "textures/weave.webp", isTexture = true),
+    BackgroundChoice("emboss", "Emboss", "textures/emboss.webp", isTexture = true),
+    BackgroundChoice("cracked", "Kaca Retak", "textures/cracked.webp", isTexture = true),
+    BackgroundChoice("moss", "Lumut", "textures/moss.webp", isTexture = true),
+
+    // Musim
+    BackgroundChoice("season_spring", "Semi", "backgrounds/season_spring.webp"),
+    BackgroundChoice("season_autumn", "Gugur", "backgrounds/season_autumn.webp"),
+    BackgroundChoice("season_winter", "Dingin", "backgrounds/season_winter.webp"),
+    BackgroundChoice("season_summer", "Panas", "backgrounds/season_summer.webp"),
+
+    // Pola
+    BackgroundChoice("stripes_warm", "Garis Hangat", "backgrounds/stripes_warm.webp", isTexture = true),
+    BackgroundChoice("stripes_cool", "Garis Dingin", "backgrounds/stripes_cool.webp", isTexture = true),
+    BackgroundChoice("stripes_mono", "Garis Mono", "backgrounds/stripes_mono.webp", isTexture = true),
+    BackgroundChoice("waves_ocean", "Ombak", "backgrounds/waves_ocean.webp", isTexture = true),
+    BackgroundChoice("confetti_party", "Konfeti", "backgrounds/confetti_party.webp", isTexture = true),
+    BackgroundChoice("speckle", "Bintik", "backgrounds/speckle.webp", isTexture = true),
 )
+
 
 
 
